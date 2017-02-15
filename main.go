@@ -30,9 +30,12 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -41,8 +44,30 @@ func root(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Servem running")
 }
 
+func serveCSS(w http.ResponseWriter, r *http.Request) {
+	filename := "gn-bootstrap.css"
+
+	dir, err := os.Getwd()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[Error] printing pwd: %v\n", err)
+		fmt.Fprintln(w, "Cannot serve css")
+		return
+	}
+
+	path := dir + "/" + filename
+
+	content, err := ioutil.ReadFile(path)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[Error] serving css: %v", err)
+		fmt.Fprintln(w, "Cannot serve css")
+		return
+	}
+	http.ServeContent(w, r, filename, time.Now(), bytes.NewReader(content))
+}
+
 func RegisterRoutes(r *mux.Router) {
 	r.HandleFunc("/", root)
+	r.HandleFunc("/servecss", serveCSS)
 }
 
 func main() {
