@@ -31,8 +31,36 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	"os"
+
+	"github.com/gorilla/mux"
 )
 
+func root(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Servem running")
+}
+
+func RegisterRoutes(r *mux.Router) {
+	r.HandleFunc("/", root)
+}
+
 func main() {
-	fmt.Println("It's alive!")
+	const port = ":3030"
+
+	fmt.Println("[Starting server] Registering routes")
+	router := mux.NewRouter()
+	RegisterRoutes(router)
+
+	server := http.Server{
+		Addr:    port,
+		Handler: router,
+	}
+
+	fmt.Println("[Starting server] Listen and serve")
+	err := server.ListenAndServe()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[Error] Server startup: %v\n", err)
+		os.Exit(-1)
+	}
 }
