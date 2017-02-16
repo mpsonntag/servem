@@ -24,16 +24,8 @@ func root(w http.ResponseWriter, r *http.Request) {
 }
 
 func serveCSS(w http.ResponseWriter, r *http.Request) {
-	filename := "gn-bootstrap.css"
-
-	dir, err := os.Getwd()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[Error] printing pwd: %v\n", err)
-		fmt.Fprintln(w, "Cannot serve css")
-		return
-	}
-
-	path := dir + "/" + filename
+	filename := "bootstrap.css"
+	path := "/home/msonntag/Chaos/work/gnode-bootstrap-theme/build/css/" + filename
 
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -44,7 +36,7 @@ func serveCSS(w http.ResponseWriter, r *http.Request) {
 	http.ServeContent(w, r, filename, time.Now(), bytes.NewReader(content))
 }
 
-func RegisterRoutes(r *mux.Router) {
+func registerRoutes(r *mux.Router) {
 	r.HandleFunc("/", root)
 	r.HandleFunc("/servecss", serveCSS)
 }
@@ -54,7 +46,7 @@ func main() {
 
 	fmt.Println("[Starting server] Registering routes")
 	router := mux.NewRouter()
-	RegisterRoutes(router)
+	registerRoutes(router)
 
 	server := http.Server{
 		Addr:    port,
