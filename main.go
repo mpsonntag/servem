@@ -63,12 +63,21 @@ func main() {
 
 	args, err := docopt.Parse(usage, nil, true, "v1.0.0", false)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "[Error] parsing command line options: %s\n", err.Error())
+		fmt.Fprintf(os.Stderr, "[Error] parsing cli arguments: %s\n", err.Error())
 		os.Exit(-1)
 	}
-	fmt.Fprintf(os.Stdout, "[Starting server] arguments: %v\n", args)
+	fmt.Fprintf(os.Stdout, "[Warmup] cli arguments: %v\n", args)
 
-	fmt.Fprintln(os.Stdout, "[Starting server] Registering routes")
+	// Use individual port if provided. Crude check whether leading colon is available.
+	if p, ok := args["--listen"]; ok {
+		port = p.(string)
+		if string(port[0]) != ":" {
+			port = ":"+ port
+		}
+		fmt.Fprintf(os.Stdout, "[Warmup] Using port: '%s'\n", port)
+	}
+
+	fmt.Fprintln(os.Stdout, "[Warmup] Registering routes")
 	router := mux.NewRouter()
 	registerRoutes(router)
 
@@ -77,7 +86,7 @@ func main() {
 		Handler: router,
 	}
 
-	fmt.Fprintln(os.Stdout, "[Starting server] Listen and serve")
+	fmt.Fprintln(os.Stdout, "[Start] Listen and serve")
 	err = server.ListenAndServe()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[Error] Server startup: %v\n", err)
