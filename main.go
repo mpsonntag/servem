@@ -16,8 +16,25 @@ import (
 	"os"
 	"time"
 
+	"github.com/docopt/docopt-go"
 	"github.com/gorilla/mux"
 )
+
+const usage = `Tiny server for serving up files locally
+
+Usage:
+  servem [--conf <dir>] [--listen <address>]
+  servem -h | --help
+  servem --howto
+  servem --version
+
+Options:
+  -h --help           Show this screen.
+  --howto             Print description howto use this server.
+  --version           Print version.
+  --conf <dir>        Path to directory where the required goodies.yml can be found. default: .
+  --listen <address>  Port to listen at [default: :8083]
+  `
 
 func root(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Servem running")
@@ -42,9 +59,16 @@ func registerRoutes(r *mux.Router) {
 }
 
 func main() {
-	const port = ":3030"
+	var port = ":3030"
 
-	fmt.Println("[Starting server] Registering routes")
+	args, err := docopt.Parse(usage, nil, true, "v1.0.0", false)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[Error] parsing command line options: %s\n", err.Error())
+		os.Exit(-1)
+	}
+	fmt.Fprintf(os.Stdout, "[Starting server] arguments: %v\n", args)
+
+	fmt.Fprintln(os.Stdout, "[Starting server] Registering routes")
 	router := mux.NewRouter()
 	registerRoutes(router)
 
@@ -53,8 +77,8 @@ func main() {
 		Handler: router,
 	}
 
-	fmt.Println("[Starting server] Listen and serve")
-	err := server.ListenAndServe()
+	fmt.Fprintln(os.Stdout, "[Starting server] Listen and serve")
+	err = server.ListenAndServe()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[Error] Server startup: %v\n", err)
 		os.Exit(-1)
