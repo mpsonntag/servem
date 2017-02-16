@@ -32,7 +32,7 @@ Options:
   -h --help           Show this screen.
   --howto             Print description howto use this server.
   --version           Print version.
-  --conf <dir>        Path to directory where the required goodies.yml can be found. default: .
+  --conf <dir>        Path to directory where the required 'goodies.yml' can be found. default: .
   --listen <address>  Port to listen at [default: :8083]
   `
 
@@ -59,11 +59,12 @@ func registerRoutes(r *mux.Router) {
 }
 
 func main() {
-	var port = ":3030"
+	port := ":3030"
+	goodies := "goodies.yml"
 
 	args, err := docopt.Parse(usage, nil, true, "v1.0.0", false)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "[Error] parsing cli arguments: %s\n", err.Error())
+		fmt.Fprintf(os.Stderr, "\n[Error] parsing cli arguments: '%s', abort...\n\n", err.Error())
 		os.Exit(-1)
 	}
 	fmt.Fprintf(os.Stdout, "[Warmup] cli arguments: %v\n", args)
@@ -72,12 +73,28 @@ func main() {
 	if p, ok := args["--listen"]; ok {
 		port = p.(string)
 		if string(port[0]) != ":" {
-			port = ":"+ port
+			port = ":" + port
 		}
-		fmt.Fprintf(os.Stdout, "[Warmup] Using port: '%s'\n", port)
+		fmt.Fprintf(os.Stdout, "[Warmup] using port: '%s'\n", port)
 	}
 
-	fmt.Fprintln(os.Stdout, "[Warmup] Registering routes")
+	// Check whether goodies file was provided.
+	path := "./" + goodies
+	fmt.Fprintf(os.Stdout, "[Warmup] checking goodies file at '%s'\n", path)
+
+	stats, err := os.Stat(path)
+	if err != nil {
+		fmt.Fprint(os.Stderr, "\n[Error] goodies file not found, abort...\n\n")
+		os.Exit(-1)
+	}
+	if stats.Size() == 0 {
+		fmt.Fprint(os.Stderr, "\n[Error] goodies file empty, abort...\n\n")
+		os.Exit(-1)
+	}
+
+	fmt.Fprintf(os.Stdout, "[Warmup] file size: %v\n", stats.Size())
+
+	fmt.Fprintln(os.Stdout, "[Warmup] registering routes")
 	router := mux.NewRouter()
 	registerRoutes(router)
 
@@ -89,7 +106,7 @@ func main() {
 	fmt.Fprintln(os.Stdout, "[Start] Listen and serve")
 	err = server.ListenAndServe()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "[Error] Server startup: %v\n", err)
+		fmt.Fprintf(os.Stderr, "\n[Error] Server startup: '%v', abort...\n\n", err)
 		os.Exit(-1)
 	}
 }
