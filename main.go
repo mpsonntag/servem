@@ -18,6 +18,7 @@ import (
 
 	"github.com/docopt/docopt-go"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/handlers"
 )
 
 const usage = `Tiny server for serving up files locally
@@ -63,7 +64,7 @@ func serveImageFile(w http.ResponseWriter, r *http.Request) {
 
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "[Error] serving image: %v", err)
+		fmt.Fprintf(os.Stderr, "[Error] serving image: %v\n", err)
 		fmt.Fprintln(w, "Cannot serve image")
 		return
 	}
@@ -74,9 +75,10 @@ func serveBuildFile(w http.ResponseWriter, r *http.Request) {
 	filepath := mux.Vars(r)["remainder"]
 	path := serveDirectory +"/"+ filepath
 
+	fmt.Fprintf(os.Stdout, "[Server] serving file: %s\n", path)
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "[Error] serving build file: %v", err)
+		fmt.Fprintf(os.Stderr, "[Error] serving build file: %v\n", err)
 		fmt.Fprintln(w, "Cannot serve requested file")
 		return
 	}
@@ -134,9 +136,15 @@ func main() {
 	router := mux.NewRouter()
 	registerRoutes(router)
 
+	handler := handlers.CORS(
+		handlers.AllowedHeaders([]string{"Accept", "Content-Type", "Authorization"}),
+		handlers.AllowedOrigins([]string{"*"}),
+		handlers.AllowedMethods([]string{"GET"}),
+	)(router)
+
 	server := http.Server{
 		Addr:    port,
-		Handler: router,
+		Handler: handler,
 	}
 
 	fmt.Fprintln(os.Stdout, "[Start] Listen and serve")
