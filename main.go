@@ -36,13 +36,16 @@ Options:
   --listen <address>  Port to listen at [default: :8083]
   `
 
+var serveDirectory = "/home/msonntag/Chaos/work/gnode-bootstrap-theme/build"
+var port = ":3030"
+
 func root(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Servem running")
 }
 
 func serveCSS(w http.ResponseWriter, r *http.Request) {
 	filename := "bootstrap.css"
-	path := "/home/msonntag/Chaos/work/gnode-bootstrap-theme/build/css/" + filename
+	path := serveDirectory +"/css/" + filename
 
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -55,12 +58,12 @@ func serveCSS(w http.ResponseWriter, r *http.Request) {
 
 func serveImageFile(w http.ResponseWriter, r *http.Request) {
 	filename := mux.Vars(r)["file"]
-	path := "/home/msonntag/Chaos/work/gnode-bootstrap-theme/build/img/" + filename
+	path := serveDirectory +"/img/" + filename
 
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "[Error] serving css: %v", err)
-		fmt.Fprintln(w, "Cannot serve css")
+		fmt.Fprintf(os.Stderr, "[Error] serving image: %v", err)
+		fmt.Fprintln(w, "Cannot serve image")
 		return
 	}
 	http.ServeContent(w, r, filename, time.Now(), bytes.NewReader(content))
@@ -73,9 +76,6 @@ func registerRoutes(r *mux.Router) {
 }
 
 func main() {
-	port := ":3030"
-	//goodies := "goodies.yml"
-
 	args, err := docopt.Parse(usage, nil, true, "v1.0.0", false)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "\n[Error] parsing cli arguments: '%s', abort...\n\n", err.Error())
@@ -94,6 +94,7 @@ func main() {
 
 	/*
 		// Check whether goodies file was provided.
+		goodies := "goodies.yml"
 		path := "./" + goodies
 		fmt.Fprintf(os.Stdout, "[Warmup] checking goodies file at '%s'\n", path)
 
