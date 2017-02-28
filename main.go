@@ -60,7 +60,7 @@ func registerRoutes(r *mux.Router) {
 
 func main() {
 	port := ":3030"
-	goodies := "goodies.yml"
+	//goodies := "goodies.yml"
 
 	args, err := docopt.Parse(usage, nil, true, "v1.0.0", false)
 	if err != nil {
@@ -78,22 +78,23 @@ func main() {
 		fmt.Fprintf(os.Stdout, "[Warmup] using port: '%s'\n", port)
 	}
 
-	// Check whether goodies file was provided.
-	path := "./" + goodies
-	fmt.Fprintf(os.Stdout, "[Warmup] checking goodies file at '%s'\n", path)
+	/*
+		// Check whether goodies file was provided.
+		path := "./" + goodies
+		fmt.Fprintf(os.Stdout, "[Warmup] checking goodies file at '%s'\n", path)
 
-	stats, err := os.Stat(path)
-	if err != nil {
-		fmt.Fprint(os.Stderr, "\n[Error] goodies file not found, abort...\n\n")
-		os.Exit(-1)
-	}
-	if stats.Size() == 0 {
-		fmt.Fprint(os.Stderr, "\n[Error] goodies file empty, abort...\n\n")
-		os.Exit(-1)
-	}
+		stats, err := os.Stat(path)
+		if err != nil {
+			fmt.Fprint(os.Stderr, "\n[Error] goodies file not found, abort...\n\n")
+			os.Exit(-1)
+		}
+		if stats.Size() == 0 {
+			fmt.Fprint(os.Stderr, "\n[Error] goodies file empty, abort...\n\n")
+			os.Exit(-1)
+		}
 
-	fmt.Fprintf(os.Stdout, "[Warmup] file size: %v\n", stats.Size())
-
+		fmt.Fprintf(os.Stdout, "[Warmup] file size: %v\n", stats.Size())
+	*/
 	fmt.Fprintln(os.Stdout, "[Warmup] registering routes")
 	router := mux.NewRouter()
 	registerRoutes(router)
