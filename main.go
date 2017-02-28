@@ -86,6 +86,7 @@ func registerRoutes(r *mux.Router) {
 	r.HandleFunc("/", root)
 	r.HandleFunc("/servecss", serveCSS)
 	r.HandleFunc("/img/{file}", serveImageFile)
+	r.HandleFunc(`/build/{remainder:[a-zA-Z0-9=\-\/]*}`, serveBuildFile)
 }
 
 func main() {
