@@ -69,6 +69,7 @@ func serveImageFile(w http.ResponseWriter, r *http.Request) {
 func registerRoutes(r *mux.Router) {
 	r.HandleFunc("/", root)
 	r.HandleFunc("/servecss", serveCSS)
+	r.HandleFunc("/img/{file}", serveImageFile)
 }
 
 func main() {
