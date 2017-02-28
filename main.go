@@ -53,6 +53,19 @@ func serveCSS(w http.ResponseWriter, r *http.Request) {
 	http.ServeContent(w, r, filename, time.Now(), bytes.NewReader(content))
 }
 
+func serveImageFile(w http.ResponseWriter, r *http.Request) {
+	filename := mux.Vars(r)["file"]
+	path := "/home/msonntag/Chaos/work/gnode-bootstrap-theme/build/img/" + filename
+
+	content, err := ioutil.ReadFile(path)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[Error] serving css: %v", err)
+		fmt.Fprintln(w, "Cannot serve css")
+		return
+	}
+	http.ServeContent(w, r, filename, time.Now(), bytes.NewReader(content))
+}
+
 func registerRoutes(r *mux.Router) {
 	r.HandleFunc("/", root)
 	r.HandleFunc("/servecss", serveCSS)
