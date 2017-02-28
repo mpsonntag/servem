@@ -23,7 +23,7 @@ import (
 const usage = `Tiny server for serving up files locally
 
 Usage:
-  servem [--conf <dir>] [--listen <address>]
+  servem [--conf <dir>] [--listen <address>] [--serve <dir>]
   servem -h | --help
   servem --howto
   servem --version
@@ -33,6 +33,7 @@ Options:
   --howto             Print description howto use this server.
   --version           Print version.
   --conf <dir>        Path to directory where the required 'goodies.yml' can be found. default: .
+  --serve <dir>       Path to directory where files should be served from.
   --listen <address>  Port to listen at [default: :8083]
   `
 
@@ -104,6 +105,11 @@ func main() {
 			port = ":" + port
 		}
 		fmt.Fprintf(os.Stdout, "[Warmup] using port: '%s'\n", port)
+	}
+
+	if srv, ok := args["--serve"]; ok && srv != nil {
+		serveDirectory = srv.(string)
+		fmt.Fprintf(os.Stdout, "[Warmup] serving files from directory: '%s'\n", serveDirectory)
 	}
 
 	/*
