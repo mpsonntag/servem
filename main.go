@@ -45,13 +45,14 @@ func root(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Servem running")
 }
 
-func genericServe(w http.ResponseWriter, r *http.Request, filePath string, msg string) {
+func genericServe(w http.ResponseWriter, r *http.Request, filePath string, fromRoute string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "[Error] serving %s: %v", msg, err)
-		fmt.Fprintf(w, "Cannot serve %s\n", msg)
+		fmt.Fprintf(os.Stderr, "[Error] serving %s: %v", fromRoute, err)
+		fmt.Fprintf(w, "Cannot serve %s\n", fromRoute)
 		return
 	}
+	fmt.Fprintf(os.Stdout, "[Serve: %s] %s\n", fromRoute, filePath)
 	http.ServeContent(w, r, filePath, time.Now(), bytes.NewReader(content))
 }
 
@@ -80,14 +81,14 @@ func serveBuildFile(w http.ResponseWriter, r *http.Request) {
 	filepath := mux.Vars(r)["remainder"]
 	path := serveDirectory + "/" + filepath
 
-	genericServe(w, r, path, "build file")
+	genericServe(w, r, path, "build")
 }
 
 func serveFontsFile(w http.ResponseWriter, r *http.Request) {
 	filepath := mux.Vars(r)["remainder"]
 	path := serveDirectory + "/fonts/" + filepath
 
-	genericServe(w, r, path, "fonts file")
+	genericServe(w, r, path, "fonts")
 }
 
 func registerRoutes(r *mux.Router) {
