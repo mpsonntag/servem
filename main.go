@@ -98,12 +98,27 @@ func serveBuildFile(w http.ResponseWriter, r *http.Request) {
 	http.ServeContent(w, r, filepath, time.Now(), bytes.NewReader(content))
 }
 
+func serveFontsFile(w http.ResponseWriter, r *http.Request) {
+	filepath := mux.Vars(r)["remainder"]
+	path := serveDirectory + "/fonts/" + filepath
+
+	fmt.Fprintf(os.Stdout, "[Server] serving file: %s\n", path)
+	content, err := ioutil.ReadFile(path)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[Error] serving fonts file: %v\n", err)
+		fmt.Fprintln(w, "Cannot serve requested file")
+		return
+	}
+	http.ServeContent(w, r, filepath, time.Now(), bytes.NewReader(content))
+}
+
 func registerRoutes(r *mux.Router) {
 	r.HandleFunc("/", root)
 	r.HandleFunc("/servecss", serveCSS)
 	r.HandleFunc("/servejs", serveJS)
 	r.HandleFunc("/img/{file}", serveImageFile)
 	r.HandleFunc(`/build/{remainder:[a-zA-Z0-9=\-\/]*}`, serveBuildFile)
+	r.HandleFunc(`/fonts/{remainder}`, serveFontsFile)
 }
 
 func main() {
