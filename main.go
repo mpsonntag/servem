@@ -58,6 +58,19 @@ func serveCSS(w http.ResponseWriter, r *http.Request) {
 	http.ServeContent(w, r, filename, time.Now(), bytes.NewReader(content))
 }
 
+func serveJS(w http.ResponseWriter, r *http.Request) {
+	filename := "bootstrap.js"
+	path := serveDirectory + "/js/" + filename
+
+	content, err := ioutil.ReadFile(path)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[Error] serving js: %v", err)
+		fmt.Fprintln(w, "Cannot serve js")
+		return
+	}
+	http.ServeContent(w, r, filename, time.Now(), bytes.NewReader(content))
+}
+
 func serveImageFile(w http.ResponseWriter, r *http.Request) {
 	filename := mux.Vars(r)["file"]
 	path := serveDirectory + "/img/" + filename
@@ -88,6 +101,7 @@ func serveBuildFile(w http.ResponseWriter, r *http.Request) {
 func registerRoutes(r *mux.Router) {
 	r.HandleFunc("/", root)
 	r.HandleFunc("/servecss", serveCSS)
+	r.HandleFunc("/servejs", serveJS)
 	r.HandleFunc("/img/{file}", serveImageFile)
 	r.HandleFunc(`/build/{remainder:[a-zA-Z0-9=\-\/]*}`, serveBuildFile)
 }
