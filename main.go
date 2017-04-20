@@ -45,71 +45,49 @@ func root(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Servem running")
 }
 
+func genericServe(w http.ResponseWriter, r *http.Request, filePath string, msg string) {
+	content, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[Error] serving %s: %v", msg, err)
+		fmt.Fprintf(w, "Cannot serve %s\n", msg)
+		return
+	}
+	http.ServeContent(w, r, filePath, time.Now(), bytes.NewReader(content))
+}
+
 func serveCSS(w http.ResponseWriter, r *http.Request) {
 	filename := "bootstrap.css"
 	path := serveDirectory + "/css/" + filename
 
-	content, err := ioutil.ReadFile(path)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[Error] serving css: %v", err)
-		fmt.Fprintln(w, "Cannot serve css")
-		return
-	}
-	http.ServeContent(w, r, filename, time.Now(), bytes.NewReader(content))
+	genericServe(w, r, path, "css")
 }
 
 func serveJS(w http.ResponseWriter, r *http.Request) {
 	filename := "bootstrap.js"
 	path := serveDirectory + "/js/" + filename
 
-	content, err := ioutil.ReadFile(path)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[Error] serving js: %v", err)
-		fmt.Fprintln(w, "Cannot serve js")
-		return
-	}
-	http.ServeContent(w, r, filename, time.Now(), bytes.NewReader(content))
+	genericServe(w, r, path, "js")
 }
 
 func serveImageFile(w http.ResponseWriter, r *http.Request) {
 	filename := mux.Vars(r)["file"]
 	path := serveDirectory + "/img/" + filename
 
-	content, err := ioutil.ReadFile(path)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[Error] serving image: %v\n", err)
-		fmt.Fprintln(w, "Cannot serve image")
-		return
-	}
-	http.ServeContent(w, r, filename, time.Now(), bytes.NewReader(content))
+	genericServe(w, r, path, "image")
 }
 
 func serveBuildFile(w http.ResponseWriter, r *http.Request) {
 	filepath := mux.Vars(r)["remainder"]
 	path := serveDirectory + "/" + filepath
 
-	fmt.Fprintf(os.Stdout, "[Server] serving file: %s\n", path)
-	content, err := ioutil.ReadFile(path)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[Error] serving build file: %v\n", err)
-		fmt.Fprintln(w, "Cannot serve requested file")
-		return
-	}
-	http.ServeContent(w, r, filepath, time.Now(), bytes.NewReader(content))
+	genericServe(w, r, path, "build file")
 }
 
 func serveFontsFile(w http.ResponseWriter, r *http.Request) {
 	filepath := mux.Vars(r)["remainder"]
 	path := serveDirectory + "/fonts/" + filepath
 
-	fmt.Fprintf(os.Stdout, "[Server] serving file: %s\n", path)
-	content, err := ioutil.ReadFile(path)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[Error] serving fonts file: %v\n", err)
-		fmt.Fprintln(w, "Cannot serve requested file")
-		return
-	}
-	http.ServeContent(w, r, filepath, time.Now(), bytes.NewReader(content))
+	genericServe(w, r, path, "fonts file")
 }
 
 func registerRoutes(r *mux.Router) {
