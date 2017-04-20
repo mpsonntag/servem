@@ -17,8 +17,8 @@ import (
 	"time"
 
 	"github.com/docopt/docopt-go"
-	"github.com/gorilla/mux"
 	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 )
 
 const usage = `Tiny server for serving up files locally
@@ -47,7 +47,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 
 func serveCSS(w http.ResponseWriter, r *http.Request) {
 	filename := "bootstrap.css"
-	path := serveDirectory +"/css/" + filename
+	path := serveDirectory + "/css/" + filename
 
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -60,7 +60,7 @@ func serveCSS(w http.ResponseWriter, r *http.Request) {
 
 func serveImageFile(w http.ResponseWriter, r *http.Request) {
 	filename := mux.Vars(r)["file"]
-	path := serveDirectory +"/img/" + filename
+	path := serveDirectory + "/img/" + filename
 
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -73,7 +73,7 @@ func serveImageFile(w http.ResponseWriter, r *http.Request) {
 
 func serveBuildFile(w http.ResponseWriter, r *http.Request) {
 	filepath := mux.Vars(r)["remainder"]
-	path := serveDirectory +"/"+ filepath
+	path := serveDirectory + "/" + filepath
 
 	fmt.Fprintf(os.Stdout, "[Server] serving file: %s\n", path)
 	content, err := ioutil.ReadFile(path)
