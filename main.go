@@ -56,32 +56,11 @@ func genericServe(w http.ResponseWriter, r *http.Request, filePath string, fromR
 	http.ServeContent(w, r, filePath, time.Now(), bytes.NewReader(content))
 }
 
-func serveCSS(w http.ResponseWriter, r *http.Request) {
-	filename := "bootstrap.css"
-	path := serveDirectory + "/css/" + filename
-
-	genericServe(w, r, path, "css")
-}
-
-func serveJS(w http.ResponseWriter, r *http.Request) {
-	filename := "bootstrap.js"
-	path := serveDirectory + "/js/" + filename
-
-	genericServe(w, r, path, "js")
-}
-
 func serveImageFile(w http.ResponseWriter, r *http.Request) {
 	filename := mux.Vars(r)["file"]
 	path := serveDirectory + "/img/" + filename
 
 	genericServe(w, r, path, "image")
-}
-
-func serveBuildFile(w http.ResponseWriter, r *http.Request) {
-	filepath := mux.Vars(r)["remainder"]
-	path := serveDirectory + "/" + filepath
-
-	genericServe(w, r, path, "build")
 }
 
 func serveFontsFile(w http.ResponseWriter, r *http.Request) {
@@ -101,10 +80,7 @@ func serveAnyFile(w http.ResponseWriter, r *http.Request) {
 
 func registerRoutes(r *mux.Router) {
 	r.HandleFunc("/", root)
-	r.HandleFunc("/servecss", serveCSS)
-	r.HandleFunc("/servejs", serveJS)
 	r.HandleFunc("/img/{file}", serveImageFile)
-	r.HandleFunc(`/build/{remainder:[a-zA-Z0-9=\-\/]*}`, serveBuildFile)
 	r.HandleFunc(`/fonts/{remainder}`, serveFontsFile)
 	r.HandleFunc(`/{dir}/{remainder}`, serveAnyFile)
 }
