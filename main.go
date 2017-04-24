@@ -58,21 +58,21 @@ func genericServe(w http.ResponseWriter, r *http.Request, filePath string, fromR
 
 func serveImageFile(w http.ResponseWriter, r *http.Request) {
 	filename := mux.Vars(r)["file"]
-	path := serveDirectory + "/img/" + filename
+	path := fmt.Sprintf("%s/img/%s", serveDirectory, filename)
 
 	genericServe(w, r, path, "image")
 }
 
 func serveFontsFile(w http.ResponseWriter, r *http.Request) {
-	filepath := mux.Vars(r)["remainder"]
-	path := serveDirectory + "/fonts/" + filepath
+	filename := mux.Vars(r)["file"]
+	path := fmt.Sprintf("%s/fonts/%s", serveDirectory, filename)
 
 	genericServe(w, r, path, "fonts")
 }
 
 func serveAnyFile(w http.ResponseWriter, r *http.Request) {
 	dir := mux.Vars(r)["dir"]
-	filepath := mux.Vars(r)["remainder"]
+	filepath := mux.Vars(r)["file"]
 	path := fmt.Sprintf("%s/%s/%s", serveDirectory, dir, filepath)
 
 	genericServe(w, r, path, "dynFile")
@@ -81,8 +81,8 @@ func serveAnyFile(w http.ResponseWriter, r *http.Request) {
 func registerRoutes(r *mux.Router) {
 	r.HandleFunc("/", root)
 	r.HandleFunc("/img/{file}", serveImageFile)
-	r.HandleFunc(`/fonts/{remainder}`, serveFontsFile)
-	r.HandleFunc(`/{dir}/{remainder}`, serveAnyFile)
+	r.HandleFunc(`/fonts/{file}`, serveFontsFile)
+	r.HandleFunc(`/{dir}/{file}`, serveAnyFile)
 }
 
 func main() {
