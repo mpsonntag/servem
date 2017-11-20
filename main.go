@@ -78,11 +78,23 @@ func serveAnyFile(w http.ResponseWriter, r *http.Request) {
 	genericServe(w, r, path, "dynFile")
 }
 
+func serveDeepDir(w http.ResponseWriter, r *http.Request) {
+	dir := mux.Vars(r)["dir"]
+	deepdir := mux.Vars(r)["deepdir"]
+	file := mux.Vars(r)["file"]
+	fmt.Fprintf(os.Stdout, "Trying to serve %s\n", dir)
+	path := fmt.Sprintf("%s/%s/%s/%s", serveDirectory, dir, deepdir, file)
+
+	genericServe(w, r, path, "dynFile")
+}
+
+// TODO server variable depth url
 func registerRoutes(r *mux.Router) {
 	r.HandleFunc("/", root)
 	r.HandleFunc("/img/{file}", serveImageFile)
 	r.HandleFunc(`/fonts/{file}`, serveFontsFile)
 	r.HandleFunc(`/{dir}/{file}`, serveAnyFile)
+	r.HandleFunc(`/{dir}/{deepdir}/{file}`, serveDeepDir)
 }
 
 func main() {
